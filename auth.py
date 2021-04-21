@@ -1,118 +1,132 @@
-database = {}
 import random
+import validation
+import database
+from getpass import getpass
 
 def init():
-    isValidSelection = False
+
+    is_valid_selection = False
     print("Welcome to Python National Bank")
 
-    while isValidSelection == False:
-         haveAccount = int(input("Do you have an account with us?: Press 1 (for yes) or 2 (for no). \n"))
-         if(haveAccount == 1):
-             isValidSelection = True
-             login()
-         elif(haveAccount == 2):
-            isValidSelection = True
-            print(register())
-         else:
-             print("You have selected an invalid option. Please try again.")
+    have_account = int(input("Do you have an account with us?: Press 1 (for yes) or 2 (for no). \n"))
+
+    if have_account == 1:
+        is_valid_selection = True
+        login()
+    elif have_account == 2:
+        is_valid_selection = True
+        print(register())
+    else:
+        print("You have selected an invalid option. Please try again.")
+
 
 def login():
     print("**** LOGIN ****")
 
-    isLoginSuccessful = False
+    account_number_by_user = input("Please enter your account number. \n")
 
-    while isLoginSuccessful == False:
-        accountNumberByUser = int(input("Please enter your account number. \n"))
-        password = input("Please enter your password. \n")
-        for accountNumber,userDetails in database.items():
-            if(accountNumber == accountNumberByUser):
-                if(userDetails[3] == password):
-                    isLoginSuccessful = True
-                else:
-                    print('Invalid account number or password. Please try again')
+    is_valid_account_number = validation.account_number_validation(account_number_by_user)
 
+    if is_valid_account_number:
 
-    bankOperation(userDetails)
+        password = getpass("Please enter your password. \n")
 
+        user = database.authenticated_user(is_valid_account_number, password)
+        if user:
+            bank_operation(user)
+
+        print('Invalid account number or password. Please try again')
+        login()
+    else:
+        init()
 
 
 def register():
     print('**** Register your new account. *****')
+
     email = input("What is your email address? \n")
     first_name = input("What is your first name? \n")
     last_name = input("What is your last name? \n")
-    password = input("Please create a secure password to use: \n")
 
-    accountNumber = generateAccountNumber()
-    database[accountNumber] = [first_name, last_name, email, password,]
+    password = getpass("Please create a secure password to use: \n")
 
-    print("Your account has been created.")
-    print("Your account number is: %d" % accountNumber)
+    account_number = generate_account_number()
 
-    login()
 
-def bankOperation(user):
-    print("Welcome %s %s" % (user[0], user[1])) 
+
+    # database[accountNumber] = [first_name, last_name, email, password, 0]
+
+    is_user_created = database.create(account_number, first_name, last_name, email, password)
     
-    selectedOption = int(input("What service do you need? (1) Deposit, (2) Withdrawal, (3) Logoff, (4) Exit. \n")) 
+    if is_user_created:
+        print("Your account has been created.")
+        print("Your account number is: %d" % account_number)
+        login()
+    else:
+        print("Something went wrong, please try again.")
+        register()
 
-    if(selectedOption == 1):
-        depositOperation()
-    elif(selectedOption == 2):
-        withdrawalOperation()
-    elif(selectedOption == 3):
+
+def bank_operation(user):
+    print("Welcome %s %s" % (user[0], user[1]))
+
+    selected_option = int(input("What service do you need? (1) Deposit, (2) Withdrawal, (3) Logoff, (4) Exit. \n"))
+
+    if selected_option == 1:
+        deposit_operation(user)
+
+    elif selected_option == 2:
+        withdrawal_operation(user)
+
+    elif selected_option == 3:
         logoff()
-    elif(selectedOption == 4):
+
+    elif selected_option == 4:
         exit()
+
     else:
         print("Invalid option selected. Please try again")
-    bankOperation(user)
-        
 
-def withdrawalOperation():
+    bank_operation(user)
+
+
+def withdrawal_operation(user_data):
     print("**** WITHDRAW ****")
-    print("Your current balance is $%s" % currentBalance())
-    if(currentBalance() <= 0):
+    print("Your current balance is $%s" % current_balance(user_data[4]))
+    if current_balance(user_data[4]) <= 0:
         print("Insufficient funds in your account.")
     else:
-        withdrawalAmount = int(input("How much money would you like to withdraw from your account? \n"))
-        updatedBalance = currentBalance() - withdrawalAmount
-        print("Your new balance is $%s " % updatedBalance)
-        print("** Thank you for choosing National Python Bank. **")
+        database.user_withdrawal(user_data[4])
         exit()
-        
 
-def depositOperation():
+        #withdrawal_amount = int(input("How much money would you like to withdraw from your account? \n"))
+        # updated_balance = current_balance(user_details) - withdrawal_amount
+
+def deposit_operation(user_data):
     print("**** DEPOSIT ****")
-    print("Your current balance is $%s" % currentBalance())
-    depositAmount = int(input("How much money would you like to deposit into your account? \n"))
-    newBalance = currentBalance() + depositAmount
-    print("Your new balance is $%s" % newBalance) 
-    print("** Thank you for choosing National Python Bank. **")
+    print("Your current balance is $%s" % current_balance(user_data[4]))
+    database.user_deposit(user_data[4])
     exit()
-    
 
 
 def logoff():
     print("Logoff")
     login()
 
-def generateAccountNumber():
+
+def generate_account_number():
     print("Generating your Account Number")
 
-    return random.randrange(1111111111,9999999999)
-
-def currentBalance():
-   return random.randint(0,100)
-  
-
-    
+    return random.randrange(1111111111, 9999999999)
 
 
-    
-#def updatedBalance():
-    
+def current_balance(user_data):
+    balance = user_data[4]
+    return user_data[4]
+
+
+# def updatedBalance():
+
 
 ## BANK SYSTEM ##
 init()
-
