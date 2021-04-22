@@ -53,7 +53,7 @@ def user_withdrawal(user_account_number, user_data):
     print("Your new balance is $%s " % updated_balance)
     print("** Thank you for choosing National Python Bank. **")
     return update(user_account_number, user_data)
-    exit()
+    
 
 def user_deposit(user_account_number, user_data):
     balance = user_data[4]
@@ -62,10 +62,6 @@ def user_deposit(user_account_number, user_data):
     print("Your new balance is $%s" % updated_balance)
     print("** Thank you for choosing National Python Bank. **")
     return update(user_account_number, user_data)
-    exit()
-
-
-
 
 
 
@@ -140,5 +136,5 @@ def login_session(account_number, password):
     if authenticated_user(account_number, password):
         f = open(user_db_path_2 + str(account_number) + ".txt", "x")
         user_login = True
-        if user_login == False:
-            delete(login_session(account_number, password))
+
+

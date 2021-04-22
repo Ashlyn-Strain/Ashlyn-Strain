@@ -3,8 +3,8 @@ import validation
 import database
 from getpass import getpass
 
-def init():
 
+def init():
     is_valid_selection = False
     print("Welcome to Python National Bank")
 
@@ -33,6 +33,7 @@ def login():
 
         user = database.authenticated_user(is_valid_account_number, password)
         if user:
+            login_session = database.login_session(account_number_by_user, password)
             bank_operation(user)
 
         print('Invalid account number or password. Please try again')
@@ -52,12 +53,10 @@ def register():
 
     account_number = generate_account_number()
 
-
-
     # database[accountNumber] = [first_name, last_name, email, password, 0]
 
     is_user_created = database.create(account_number, first_name, last_name, email, password)
-    
+
     if is_user_created:
         print("Your account has been created.")
         print("Your account number is: %d" % account_number)
@@ -99,8 +98,9 @@ def withdrawal_operation(user_data):
         database.user_withdrawal(user_data[4])
         exit()
 
-        #withdrawal_amount = int(input("How much money would you like to withdraw from your account? \n"))
+        # withdrawal_amount = int(input("How much money would you like to withdraw from your account? \n"))
         # updated_balance = current_balance(user_details) - withdrawal_amount
+
 
 def deposit_operation(user_data):
     print("**** DEPOSIT ****")
@@ -109,8 +109,9 @@ def deposit_operation(user_data):
     exit()
 
 
-def logoff():
+def logoff(user_account_number):
     print("Logoff")
+    database.delete(user_account_number)
     login()
 
 
@@ -125,8 +126,4 @@ def current_balance(user_data):
     return user_data[4]
 
 
-# def updatedBalance():
-
-
-## BANK SYSTEM ##
 init()
